@@ -1,0 +1,89 @@
+#index {
+  background-image: url("../img/background.png");
+}
+
+#system {
+  background-image: url("../img/background2.png");
+}
+
+.login {
+  background-color: rgba(0,0,0,0.3);
+  padding: 20px 45px 15px 45px;
+  text-shadow: none;
+}
+
+.login h2 {
+  font-size: 35px;
+  margin-left: -15px;
+  color: white;
+  margin-bottom: 20px;
+  margin-top: 0px !important;
+}
+
+.smallborder {
+  border-radius: 2px !important;
+}
+
+.vert-center {
+  min-height: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.box1 {
+  color: white;
+}
+
+.box1 h1 {
+  font-size: 40px;
+}
+
+.box1 p {
+  font-size: 19px;
+}
+
+.iconhome {
+  padding: 15px 22px 15px 20px;
+  border-radius: 40px;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  text-align: center;
+  font-size: 40px;
+  background: rgba(0,0,0,0.3);;
+  color: #f0ad4e;
+}
+
+.icongebruiker {
+  padding: 22px 22px 22px 22px;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  text-align: center;
+  font-size: 40px;
+  background: #f0ad4e;
+  color: rgba(0,0,0,0.3);
+}
+
+.box2 {
+  background-color: white;
+  border-radius: 5px;
+  padding: 1px 25px 15px 25px;
+  text-shadow: none;
+  color: black;
+}
+
+.navbar-brand,
+.navbar-nav li a {
+    line-height: 65px;
+    height: 65px;
+    padding-top: 0;
+}
+
+.oranje {
+  color: #f0ad4e;
+}
+
+.oranje h3 {
+  font-weight: 600;
+}

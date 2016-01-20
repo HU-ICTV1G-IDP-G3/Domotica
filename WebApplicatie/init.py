@@ -22,19 +22,31 @@ KVSessionExtension(store, app)
 
 # @app.before_request
 # def db_connect():
-#     g.db_conn = pymysql.connect(host='host@host.com',
-#                                  user='username',
-#                                  password='password',
-#                                  db='databasename',
+#     g.db_conn = pymysql.connect(host='213.233.237.7',
+#                                  user='domotica',
+#                                  password='SecretPass :O :O :O',
+#                                  db='domotica_db',
 #                                  charset='utf8',
 #                                  port=3306)
 #     global cur
 #     cur = g.db_conn.cursor()
 
 @app.route('/')
-def main():
-    return render_template("home.html")
+def login():
+    return render_template("login.html")
+
+@app.route('/bewoner/')
+def bewoner():
+    return render_template("bewoner.html")
+
+@app.route('/meldkamer/')
+def meldkamer():
+    return render_template("meldkamer.html")
+
+@app.route('/admin/')
+def admin():
+    return render_template("admin.html")
 
 if __name__ == '__main__':
-    app.secret_key = '*87gas6&*(73()fa98Nla&$62Nv%#{az' #Secret key for sessions
+    app.secret_key = '*87gas6&*(73()fa98Nla&$62Nv%#{az' #Secret key for sessions | This key HAS TO BE CHANGED IN THE FINAL VERSION (and not being published on GitHub)
     app.run(debug=True)
