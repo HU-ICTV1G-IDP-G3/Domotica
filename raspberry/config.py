@@ -1,5 +1,7 @@
+import os
+
 def LoadConfig():
-    f = open('config', 'r')
+    f = open(os.path.join(os.path.dirname(__file__), 'config'), 'r')
     config = {}
 
     for line in f.readlines():
