@@ -9,3 +9,7 @@
 * Redis
 * Wtforms
 * Pymysql
+
+### Database Model
+
+![Database model](/database.png?raw=true)
