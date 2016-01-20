@@ -31,6 +31,16 @@ def DisconnectDatabase():
 
     CONNECTION.close()
 
+def SetHelpButton(woning, value):
+    try:
+        with CONNECTION.cursor() as cursor:
+            sql = "UPDATE `Woning` SET `helpbutton`=%s WHERE `idUser`=%s;"
+            cursor.execute(sql, (str(value), woning))
+
+        CONNECTION.commit()
+    except Exception as e:
+        print e
+
 def GetLightStatus():
     try:
         with CONNECTION.cursor() as cursor:

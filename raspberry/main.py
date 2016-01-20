@@ -23,7 +23,7 @@ def Main():
         database.ConnectDatabase()
 
         if raspberry.UpdateHelpButton():
-            print "Help Button Pressed"
+            database.SetHelpButton(conf['woning'], 1);
         UpdateLights()
 
         database.DisconnectDatabase()
