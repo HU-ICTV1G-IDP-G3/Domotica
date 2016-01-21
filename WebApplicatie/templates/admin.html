@@ -26,30 +26,33 @@
 
 			<h3><span class="oranje">Nieuwe gebruiker</span></h3>
 
-				<form class="form-horizontal" style="padding: 14px;">
+				<form class="form-horizontal" method="post" style="padding: 14px;">
+					{{ NieuweGebruikerForm.csrf_token }}
 
-						<div class="form-group">
-								<input type="text" class="form-control" id="username" placeholder="Gebruikersnaam">
+						<div class="form-group {% if NieuweGebruikerForm.gebruikersnaam.errors %} has-error {% endif %}">
+								{{ NieuweGebruikerForm.gebruikersnaam(placeholder="Gebruikersnaam", class="form-control") }}
 						</div>
 
-						<div class="form-group">
-								<input type="text" class="form-control" id="Voornaam" placeholder="Voornaam">
+						<div class="form-group {% if NieuweGebruikerForm.password.errors %} has-error {% endif %}">
+								{{ NieuweGebruikerForm.password(placeholder="Wachtwoord", class="form-control") }}
 						</div>
 
-						<div class="form-group">
-								<input type="text" class="form-control" id="Achternaam" placeholder="Achternaam">
+						<div class='row' style="margin-top: -17px;">
+							<div class='span12'>
+									<hr style="margin-left: 2px;margin-right: 2px;">
+							</div>
 						</div>
 
-						<div class="form-group">
-								<input type="password" class="form-control" id="Wachtwoord" placeholder="Wachtwoord">
+						<div class="form-group {% if NieuweGebruikerForm.voornaam.errors %} has-error {% endif %}">
+								{{ NieuweGebruikerForm.voornaam(placeholder="Voornaam", class="form-control") }}
 						</div>
 
-						<div class="form-group text-right">
-							<select id="type" name="type" class="form-control">
-										<option value="1">Bewoner</option>
-										<option value="2">Meldkamer medewerker</option>
-										<option value="3">Admin</option>
-									</select>
+						<div class="form-group {% if NieuweGebruikerForm.achternaam.errors %} has-error {% endif %}">
+								{{ NieuweGebruikerForm.achternaam(placeholder="Achternaam", class="form-control") }}
+						</div>
+
+						<div class="form-group text-right {% if NieuweGebruikerForm.rang.errors %} has-error {% endif %}">
+							{{ NieuweGebruikerForm.rang(placeholder="Achternaam", class="form-control") }}
 						</div>
 
 						<div class="form-group text-right">

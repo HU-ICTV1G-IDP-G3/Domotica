@@ -87,3 +87,14 @@
 .oranje h3 {
   font-weight: 600;
 }
+
+hr {
+  -moz-border-bottom-colors: none;
+  -moz-border-image: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: rgba(123, 123, 123, 0.46);;
+  border-style: solid none;
+  margin: 18px 0;
+}
