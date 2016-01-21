@@ -47,13 +47,14 @@
 
             <h2><span class="oranje">Log hier in</span></h2>
 
-            <form class="form-horizontal">
-              <div class="form-group">
-                  <input type="text" class="form-control input-lg smallborder" placeholder="Gebruikersnaam">
+            <form class="form-horizontal" method="post">
+                {{ LoginForm.csrf_token }}
+              <div class="form-group {% if LoginForm.gebruikersnaam.errors %} has-error {% endif %}">
+                  {{ LoginForm.gebruikersnaam(placeholder="Gebruikersnaam", class="form-control input-lg smallborder") }}
               </div>
 
-              <div class="form-group">
-                  <input type="password" class="form-control input-lg smallborder" placeholder="Wachtwoord">
+              <div class="form-group {% if LoginForm.password.errors %} has-error {% endif %}">
+                  {{ LoginForm.password(placeholder="Wachtwoord", class="form-control input-lg smallborder") }}
               </div>
 
               <div class="form-group text-right">

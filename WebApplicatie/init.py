@@ -11,6 +11,7 @@ from wtforms.validators import EqualTo, Optional, data_required
 from wtforms.validators import Length, Email
 
 from passlib.handlers.sha2_crypt import sha256_crypt as hash
+from functools import wraps
 
 #Importeert de redis functies voor later gebruik.
 store = RedisStore(redis.StrictRedis())
@@ -36,41 +37,153 @@ class NieuweGebruikerForm(Form):
            Length(min=2, max=30, message=(u'Uw achternaam moet minimaal 2 en mag maximaal 30 tekens bevatten.'))])
      rang = SelectField('Rang', choices=[("1", "Bewoner"), ("2", "Meldkamer medewerker"), ("3", "Admin")], default="1")
 
+class LoginForm(Form):
+     gebruikersnaam = StringField('Gebruikersnaam', validators=[
+           data_required('Voer een gebruikersnaam in.')])
+     password = PasswordField('Voer een veilig wachtwoord in.', validators=[
+           data_required('Voer een geldig wachtwoord in.')])
+
+
 #Voor serverside sessions, maakt gebruik van redis. (Vergeet dus niet dat redis een vereiste is op de locatie waar je deze applicatie wilt draaien.)
 KVSessionExtension(store, app)
 
-# @app.before_request
-# def db_connect():
-#     g.db_conn = pymysql.connect(host='213.233.237.7',
-#                                  user='domotica',
-#                                  password='Secret so secret',
-#                                  db='domotica_db',
-#                                  charset='utf8',
-#                                  port=3306)
-#     global cur
-#     cur = g.db_conn.cursor()
+@app.before_request
+def db_connect():
+    g.db_conn = pymysql.connect(host='213.233.237.7',
+                                 user='domotica',
+                                 password='even the NSA dont know this',
+                                 db='domotica_db',
+                                 charset='utf8',
+                                 port=3306)
+    global cur
+    cur = g.db_conn.cursor()
+
+@app.teardown_request
+def db_disconnect(exception=None):
+    g.db_conn.close()
+
+#Check of de gebruiker is ingelogd.
+def login_req(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'ingelogd' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+    return wrap
+
+#Check of de gebruiker een bewoner is of niet:
+#Indien niet kan de gebruiker NIET naar /bewoner/
+def bewoner_req(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if int(session['login'][0][2]) == 1:
+            return f(*args, **kwargs)
+        elif int(session['login'][0][2]) == 2:
+            return redirect(url_for('meldkamer'))
+        elif int(session['login'][0][2]) >= 3:
+            return redirect(url_for('admin'))
+        else:
+            #Indien geen van de bovenstaande optie van toepassing zijn word de persoon uitgelogd.
+            session.clear()
+            gc.collect()
+            return redirect(url_for('login'))
+    return wrap
+
+#Check of de gebruiker wel een status heeft als meldkamer of hoger (admin).
+def meldkamer_req(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        #Voor toegang van de meldkamer pagina is een status van 2 of hoger nodig.
+        if int(session['login'][0][2]) >= 2:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('bewoner'))
+    return wrap
+
+#Check of de gebruiker wel een admin status heeft.
+def admin_req(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        #Voor toegang van de admin pagina heb je de status 3 nodig.
+        if int(session['login'][0][2]) == 3:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('bewoner'))
+    return wrap
+
+#De sessie wordt gecleared en memory gedumpt, daarna word de user doorgeschakelt naar de homepage (login).
+@app.route('/logout/')
+@login_req
+def logout():
+    session.clear()
+    gc.collect()
+    return redirect(url_for('login'))
 
 
 #De index pagina, met de login staat hieronder vermeld:
 @app.route('/', methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+    #Vraagt het eerder gemaakte 'NieuweGebruikerForm' form aan.
+    form = LoginForm()
+
+    #Zodra de post op de pagina langs de vallidators van WTForm zijn gegaan kan de rest plaatsvinden.
+    if form.validate_on_submit():
+        #Nodig voor de request die we hierna gaan maken.
+        inloggen = LoginForm(request.form)
+
+        #Alle velden worden binnengehaald en aan een variabele gekoppelt.
+        username = inloggen.gebruikersnaam.data
+        password = inloggen.password.data
+
+        #Haal username en wachtwoord op uit de database.
+        cur.execute("SELECT username, password, rank, forename, lastname, idUser FROM User WHERE username =%s", (escape(username)))
+        login_info = cur.fetchall()
+
+        #Bestaat deze username wel? Anders een error...:
+        if not login_info == ():
+
+            #Wachtwoord vergelijken met hash:
+            if hash.verify(password, login_info[0][1]):
+                session['ingelogd'] = True
+                session['login'] = login_info
+                if int(login_info[0][2]) == 3:
+                    return redirect(url_for('admin'))
+                elif int(login_info[0][2]) == 2:
+                    return redirect(url_for('meldkamer'))
+                else:
+                    return redirect(url_for('bewoner'))
+
+            else:
+                form.password.errors.append('')
+
+        else:
+            form.gebruikersnaam.errors.append('')
+
+
+    return render_template("login.html", LoginForm=form)
 
 
 #De bewoner pagina, met de verlichting functies staan hieronder vermeld:
 @app.route('/bewoner/', methods=["GET", "POST"])
+@login_req
+@bewoner_req
 def bewoner():
     return render_template("bewoner.html")
 
 
 #De meldkamer pagina, staat hieronder vermeld:
 @app.route('/meldkamer/', methods=["GET", "POST"])
+@login_req
+@meldkamer_req
 def meldkamer():
     return render_template("meldkamer.html")
 
 
 #De admin pagina, met de funcites om een nieuw account aan te maken en te beheren staat hieronder vermeld:
 @app.route('/admin/', methods=["GET", "POST"])
+@login_req
+@admin_req
 def admin():
     #Vraagt het eerder gemaakte 'NieuweGebruikerForm' form aan.
     form = NieuweGebruikerForm()
@@ -97,8 +210,10 @@ def admin():
 
             #De gegevens worden naar de database verstuurd:
             cur.execute("INSERT INTO User (username, forename, lastname, password, rank) VALUES (%s, %s, %s, %s, %s)", (escape(username), escape(voornaam), escape(achternaam), versleutelde_password, int(rang)))
+            g.db_conn.commit()
 
-
+            #Redirect naar dezelfde pagina voor een refresh, later misschien naar de net aangemaakte user?
+            return redirect(url_for('admin'))
 
     return render_template("admin.html", NieuweGebruikerForm=form)
 
