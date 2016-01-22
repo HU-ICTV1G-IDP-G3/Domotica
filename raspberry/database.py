@@ -50,3 +50,13 @@ def GetLightStatus():
             return result
     except Exception as e:
         print e
+
+def GetCameraStatus(woning):
+    try:
+        with CONNECTION.cursor() as cursor:
+            sql = "SELECT * FROM `Woning` WHERE `idWoning`=%s;"
+            cursor.execute(sql, (woning,))
+            result = cursor.fetchone()
+            return result
+    except Exception as e:
+        print e
