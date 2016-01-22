@@ -51,7 +51,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='even the NSA dont know this',
+                                 password='This password is quantum computer proof.',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -137,7 +137,7 @@ def login():
         password = inloggen.password.data
 
         #Haal username en wachtwoord op uit de database.
-        cur.execute("SELECT username, password, rank, forename, lastname, idUser FROM User WHERE username =%s", (escape(username)))
+        cur.execute("SELECT username, password, rank, forename, lastname, idUser, idWoning FROM User WHERE username =%s", (escape(username)))
         login_info = cur.fetchall()
 
         #Bestaat deze username wel? Anders een error...:
@@ -169,7 +169,11 @@ def login():
 @login_req
 @bewoner_req
 def bewoner():
-    return render_template("bewoner.html")
+    idWoning = int(session['login'][0][6])
+    cur.execute("SELECT idLight, idWoning, name, turnedon FROM domotica_db.Light WHERE idWoning =%s", (idWoning))
+    light_info = cur.fetchall()
+
+    return render_template("bewoner.html", light_info=light_info)
 
 
 #De meldkamer pagina, staat hieronder vermeld:

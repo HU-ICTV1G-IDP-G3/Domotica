@@ -7,7 +7,7 @@
 		<div class="row" style="margin-top: 10px;">
 				<div class="col-md-2"><span class="glyphicon glyphicon-user icongebruiker"></span></div>
 				<div class="col-md-10" style="margin-left: -40px;">
-					<span class="oranje"><h3>Welkom 'user'</h3></span>
+					<span class="oranje"><h3>Welkom <span style="text-transform: capitalize;">{{ session['login'][0][3] }}!</span></h3></span>
 					<h4>Woning:</h4>
 
 				</div>
@@ -36,10 +36,7 @@
 							</div>
 							<div class="col-md-9 text-center">
 
-								<div class="btn-group" role="group" aria-label="Large button group">
-									<button type="button" class="btn btn-warning active">Uit</button>
-									<button type="button" class="btn btn-default">Aan</button>
-								</div>
+								<input id="verlichting-1" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
 
 							</div>
 					</div>
@@ -54,10 +51,8 @@
 							</div>
 							<div class="col-md-9 text-center">
 
-								<div class="btn-group" role="group" aria-label="Large button group">
-									<button type="button" class="btn btn-default">Uit</button>
-									<button type="button" class="btn btn-warning active">Aan</button>
-								</div>
+								<input id="verlichting-2" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
+
 							</div>
 					</div>
 
@@ -71,12 +66,19 @@
 							</div>
 							<div class="col-md-9 text-center">
 
-								<div class="btn-group" role="group" aria-label="Large button group">
-									<button type="button" class="btn btn-default">Uit</button>
-									<button type="button" class="btn btn-warning active">Aan</button>
-								</div>
+								<input id="verlichting-3" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
+
 							</div>
 					</div>
+
+
+					<script>
+					    $('#verlichting-1').bootstrapToggle({% if light_info[0][3]==1 %}'on'{% else %}'off'{% endif %})
+					    $('#verlichting-2').bootstrapToggle({% if light_info[1][3]==1 %}'on'{% else %}'off'{% endif %})
+					    $('#verlichting-3').bootstrapToggle({% if light_info[2][3]==1 %}'on'{% else %}'off'{% endif %})
+						$('#verlichting-3').bootstrapToggle('disable')
+				 	</script>
+
 
 		</div>
 		<div class="col-md-6 text-center">
