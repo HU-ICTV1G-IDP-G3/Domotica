@@ -1,5 +1,7 @@
 import pymysql.cursors
 
+import time
+
 CONNECTION = None
 HOST = "127.0.0.1"
 USER = 'domotica'
@@ -24,7 +26,13 @@ def ConnectDatabase():
     global PASSWORD
     global DATABASE
 
-    CONNECTION = pymysql.connect(host = HOST, user = USER, password = PASSWORD, db = DATABASE, charset = 'utf8mb4', cursorclass = pymysql.cursors.DictCursor)
+    connected = False
+    while not connected:
+        try:
+            CONNECTION = pymysql.connect(host = HOST, user = USER, password = PASSWORD, db = DATABASE, charset = 'utf8mb4', cursorclass = pymysql.cursors.DictCursor)
+            connected = True
+        except Exception:
+            time.sleep(5)
 
 def DisconnectDatabase():
     global CONNECTION
@@ -58,5 +66,15 @@ def GetCameraStatus(woning):
             cursor.execute(sql, (woning,))
             result = cursor.fetchone()
             return result
+    except Exception as e:
+        print e
+
+def SetCameraURL(camera, url):
+    try:
+        with CONNECTION.cursor() as cursor:
+            sql = "UPDATE `Camera` SET `url`=%s WHERE `idCamera`=%s;"
+            cursor.execute(sql, (url, str(camera)))
+
+        CONNECTION.commit()
     except Exception as e:
         print e
