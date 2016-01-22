@@ -29,6 +29,10 @@
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap-toggle.min.js') }}"></script>
 
+    <script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+
 <body id=system>
 
 <nav class="navbar navbar-default navbar-fixed-top">

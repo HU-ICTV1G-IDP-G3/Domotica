@@ -51,7 +51,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='This password is quantum computer proof.',
+                                 password='Still not leaked, #Yey',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -164,16 +164,67 @@ def login():
     return render_template("login.html", LoginForm=form)
 
 
+@app.route('/bewoner/verlichting')
+@login_req
+@bewoner_req
+def verlichting():
+    a = request.args.get('a', '0', type=str)
+    b = request.args.get('b', '0', type=int)
+
+    #Controlle of de gebruiker wel toegang mag hebben tot deze verlichting:
+    idWoning = int(session['login'][0][6])
+    cur.execute("SELECT idLight FROM domotica_db.Light WHERE idWoning =%s", (idWoning))
+    idlight = cur.fetchall()
+
+    #For loop te checken of variabele B voor komt in de variabele idlight (de net gefetchde waarde).
+    for i in range(len(idlight)):
+        if b in idlight[i]:
+            #Hier wordt de verlichting aangepast.
+            if a == 'false':
+                cur.execute("UPDATE Light SET turnedon=0 WHERE idLight=%s", (b))
+                g.db_conn.commit()
+            elif a == 'true':
+                cur.execute("UPDATE Light SET turnedon=1 WHERE idLight=%s", (b))
+                g.db_conn.commit()
+
+    return jsonify(result=a)
+
+
 #De bewoner pagina, met de verlichting functies staan hieronder vermeld:
 @app.route('/bewoner/', methods=["GET", "POST"])
 @login_req
 @bewoner_req
 def bewoner():
-    idWoning = int(session['login'][0][6])
-    cur.execute("SELECT idLight, idWoning, name, turnedon FROM domotica_db.Light WHERE idWoning =%s", (idWoning))
-    light_info = cur.fetchall()
+    #Check of er geen woning aan deze user is gekoppeld.
+    if not session['login'][0][6] == None or session['login'][0][6] == ():
+        heeftwoning = 1
 
-    return render_template("bewoner.html", light_info=light_info)
+        #Haalt de woning ID op uit de sessie.
+        idWoning = int(session['login'][0][6])
+
+        #Doormiddel van de woning ID wordt de informatie voor de verlichting opgehaald (gekoppeld aan de woning)
+        cur.execute("SELECT idLight, idWoning, name, turnedon FROM domotica_db.Light WHERE idWoning =%s", (idWoning))
+        light_info = cur.fetchall()
+
+        #Doormiddel van de woning ID wordt de informatie over de woning opgehaald.
+        cur.execute("SELECT idWoning, adress, camera, helpbutton FROM domotica_db.Woning WHERE idWoning =%s", (idWoning))
+        woning_info = cur.fetchall()
+
+        if not light_info == ():
+            # Deze woning heeft verlichting!
+            heeftverlichting = 1
+        else:
+            #Deze woning heeft GEEN verlichting!
+            heeftverlichting = 0
+            light_info=0
+
+    else:
+        heeftwoning=0
+        light_info=0
+        woning_info=0
+        heeftverlichting = 0
+
+    return render_template("bewoner.html", light_info=light_info, woning_info=woning_info, heeftwoning=heeftwoning, heeftverlichting=heeftverlichting)
 
 
 #De meldkamer pagina, staat hieronder vermeld:
