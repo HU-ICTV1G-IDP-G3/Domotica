@@ -9,6 +9,10 @@ import config
 
 import time
 
+import socket
+import struct
+import fcntl
+
 STREAM_PID = 0
 DEVNULL = None
 
@@ -24,20 +28,26 @@ def Main():
 
     currentCamera = None
 
+    ip = GetIP()
+    print ip
+
     while True:
         database.ConnectDatabase()
         cameraStatus = database.GetCameraStatus(conf['woning'])
-        database.DisconnectDatabase()
 
         if cameraStatus['camera'] != currentCamera:
             print "Camera Changed"
             currentCamera = cameraStatus['camera']
             if cameraStatus['camera'] == 1:
+                database.SetCameraURL(conf['camera1'], "http://%s:8080/?action=stream" % (ip,))
                 StartStream()
                 print "Waiting for new request"
             else:
+                database.SetCameraURL(conf['camera1'], "nocamera.png")
                 StopStream()
                 print "Waiting for new request"
+
+        database.DisconnectDatabase()
 
         time.sleep(0.5)
 
@@ -61,6 +71,19 @@ def StopStream():
         os.kill(STREAM_PID, signal.SIGINT)
         STREAM_PID = 0
         time.sleep(5)
+
+def GetIP():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sockfd = sock.fileno()
+    SIOCGIFADDR = 0x8915
+
+    ifreq = struct.pack('16sH14s', 'eth0', socket.AF_INET, '\x00' * 14)
+    try:
+        res = fcntl.ioctl(sockfd, SIOCGIFADDR, ifreq)
+    except Exception:
+        return None
+    ip = struct.unpack('16sH2x4s8x', res)[2]
+    return socket.inet_ntoa(ip)
 
 if __name__ == "__main__":
     try:

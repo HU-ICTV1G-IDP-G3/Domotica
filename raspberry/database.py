@@ -60,3 +60,13 @@ def GetCameraStatus(woning):
             return result
     except Exception as e:
         print e
+
+def SetCameraURL(camera, url):
+    try:
+        with CONNECTION.cursor() as cursor:
+            sql = "UPDATE `Camera` SET `url`=%s WHERE `idCamera`=%s;"
+            cursor.execute(sql, (url, str(camera)))
+
+        CONNECTION.commit()
+    except Exception as e:
+        print e
