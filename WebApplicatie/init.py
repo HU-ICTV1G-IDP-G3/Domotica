@@ -51,7 +51,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='Still not leaked, #Yey',
+                                 password='The password might be: password',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
