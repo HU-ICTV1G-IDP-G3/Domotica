@@ -52,8 +52,8 @@ cd ../
 # Make everything start on boot
 sudo crontab -e
 # Add in the following lines
-@reboot screen -S stream -d -m /usr/bin/python2 /home/pi/bin/raspberry/streaming.py
-@reboot screen -S lights -d -m /usr/bin/python2 /home/pi/bin/raspberry/main.py
+@reboot screen -S stream -d -m /usr/bin/python2 /home/pi/bin/Domotica/raspberry/streaming.py
+@reboot screen -S lights -d -m /usr/bin/python2 /home/pi/bin/Domotica/raspberry/main.py
 # Save the crontab
 
 # Enabling the crontab
