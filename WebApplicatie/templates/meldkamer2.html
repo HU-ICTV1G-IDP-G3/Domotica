@@ -6,7 +6,7 @@
 	<div class="box2">
 
 		<h3><span class="oranje">Camera stream:</span></h3>
-		<h4>Verbonden met woning: {{ camera_info[0][0] }}, camera: {{ camera_info[0][2] }}.</h4>
+		<h4>Verbonden met woning: {{ camera_id[0][3] }}, camera: {{ camera_id[0][1] }}.</h4>
 
 	</div>
 </div>
@@ -17,7 +17,7 @@
 
 		<div class="row" style="margin-top: 15px;">
 			<div class="col-md-9">
-					<img class="img-responsive" src="{{ camera_info[session['camera_url']][3] }}" alt="" />
+					<img class="img-responsive" src="{{ camera_id[0][2] }}" alt="" />
 			</div>
 			<div class="col-md-3 text">
 
@@ -36,7 +36,7 @@
 	<div class="box2">
 
 			<div style="margin-top: 13px;">
-					<a class="btn btn-primary active" href="#">{{ camera_info[0][2] }}</a>
+					<a class="btn btn-primary active" href="#">{{ camera_id[0][1] }}</a>
 			</div>
 
 	</div>
@@ -48,8 +48,7 @@
 
 			<h3><span class="oranje">Noodmedlingen:</span></h3>
 			<p>
-
-                <span id=result>Geen noodmeldingen</span>
+				Geen noodmeldingen
 			</p>
 
 	</div>

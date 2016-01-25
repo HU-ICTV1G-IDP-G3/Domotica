@@ -51,7 +51,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='The password might be: password',
+                                 password='Maybe there is no password?',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -189,6 +189,25 @@ def verlichting():
 
     return jsonify(result=a)
 
+@app.route('/bewoner/camera_uitschakelen')
+@login_req
+@bewoner_req
+def camera_uitschakelen():
+    a = request.args.get('a', '0', type=str)
+
+    #Woning ID om de cameras uit te schakelen
+    idWoning = int(session['login'][0][6])
+
+    #Camera aan of uit...
+    if a == 'false':
+        cur.execute("UPDATE Woning SET camera=0 WHERE idWoning=%s", (idWoning))
+        g.db_conn.commit()
+    elif a == 'true':
+        cur.execute("UPDATE Woning SET camera=1 WHERE idWoning=%s", (idWoning))
+        g.db_conn.commit()
+
+    return jsonify(result=a)
+
 
 #De bewoner pagina, met de verlichting functies staan hieronder vermeld:
 @app.route('/bewoner/', methods=["GET", "POST"])
@@ -210,6 +229,12 @@ def bewoner():
         cur.execute("SELECT idWoning, adress, camera, helpbutton FROM domotica_db.Woning WHERE idWoning =%s", (idWoning))
         woning_info = cur.fetchall()
 
+        if request.method == "POST":
+            alarm = request.form.get('alarm', None)
+            if alarm == "alarm":
+                cur.execute("UPDATE Woning SET helpbutton=1 WHERE idWoning=%s", (idWoning))
+                g.db_conn.commit()
+
         if not light_info == ():
             # Deze woning heeft verlichting!
             heeftverlichting = 1
@@ -227,12 +252,42 @@ def bewoner():
     return render_template("bewoner.html", light_info=light_info, woning_info=woning_info, heeftwoning=heeftwoning, heeftverlichting=heeftverlichting)
 
 
+
+@app.route('/meldkamer/alarm')
+@login_req
+@meldkamer_req
+def alarm():
+    cur.execute("SELECT idWoning, adress FROM domotica_db.Woning WHERE helpbutton = 1;")
+    a = cur.fetchall()
+    return jsonify(result=a)
+
+
 #De meldkamer pagina, staat hieronder vermeld:
 @app.route('/meldkamer/', methods=["GET", "POST"])
 @login_req
 @meldkamer_req
 def meldkamer():
-    return render_template("meldkamer.html")
+    cur.execute("SELECT idWoning, adress, camera, helpbutton FROM domotica_db.Woning")
+    woning_info = cur.fetchall()
+    cur.execute("SELECT idCamera, idWoning, name, url FROM domotica_db.Camera")
+    camera_info = cur.fetchall()
+    session['camera_url'] = 0
+    return render_template("meldkamer.html", woning_info=woning_info, camera_info=camera_info)
+
+@app.route('/meldkamer/<woning>/', methods=["GET", "POST"])
+@login_req
+@meldkamer_req
+def meldkamerstream(woning):
+    cur.execute("SELECT idWoning, adress, camera, helpbutton FROM domotica_db.Woning")
+    woning_info = cur.fetchall()
+    cur.execute("SELECT idCamera, idWoning, name, url FROM domotica_db.Camera")
+    camera_info = cur.fetchall()
+    session['camera_url'] = int(woning)
+
+    cur.execute("SELECT idCamera, name, url, idWoning FROM domotica_db.Camera WHERE idWoning =%s", (int(woning)))
+    camera_id = cur.fetchall()
+
+    return render_template("meldkamer2.html", woning_info=woning_info, camera_info=camera_info, camera_id=camera_id)
 
 
 #De admin pagina, met de funcites om een nieuw account aan te maken en te beheren staat hieronder vermeld:

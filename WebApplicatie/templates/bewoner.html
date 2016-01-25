@@ -66,16 +66,41 @@
 
 		</div>
 		<div class="col-md-6 text-center">
-
+				<form method="post">
 				<h3 style="margin-top: -5px;margin-bottom: 20px;"><span class="oranje">Indien u in gevaar verkeerd:</span></h3>
-				<button type="button" class="btn btn-warning btn-lg">Alarm knop</button>
-
+				<button type="submit" value="alarm" name="alarm" id="alarm" class="btn btn-warning btn-lg">Alarm knop</button>
+				</form>
 		</div>
 	</div>
 
 
 	</div>
 
+</div>
+
+<div class="container" style="margin-top: 15px;">
+	<div class="box2">
+
+		<div style="margin-top: 20px;">
+				<h4>Camera's tijdelijk uitschakelen: </h4>
+				<input id="camera" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
+			<script>
+			  $(function() {
+				$('#camera').change(function() {
+				  $.getJSON($SCRIPT_ROOT + '/bewoner/camera_uitschakelen', {
+					a: $(this).prop('checked')
+				  });
+				  return false;
+				})
+			  })
+			</script>
+			<script>
+				$('#camera').bootstrapToggle({% if woning_info[0][2]==1 %}'on'{% else %}'off'{% endif %})
+			</script>
+
+		</div>
+
+	</div>
 </div>
 
 {% endblock %}
