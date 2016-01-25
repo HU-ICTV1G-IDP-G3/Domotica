@@ -53,7 +53,7 @@ def Main():
                 StartStream()
                 print "Waiting for new request"
             else: # Otherwise set the url to offline camera and stop stream
-                database.SetCameraURL(conf['camera1'], "{{ url_for('static', filename='img/offline.png') }}")
+                database.SetCameraURL(conf['camera1'], "http://i.imgur.com/VQPC2tu.png")
                 StopStream()
                 print "Waiting for new request"
 
