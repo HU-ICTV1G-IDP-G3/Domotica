@@ -1,6 +1,6 @@
 # Domotica
 
-### Dependencies
+## Dependencies
 
 * Python
 * Flask
@@ -8,8 +8,20 @@
 * Simplekv
 * Redis
 * Wtforms
-* Pymysql
+* PyMySQL
+* screen
+* libjpeg8-dev
+* imagemagick
+* mjpg-streamer
 
-### Database Model
+## Installation
+
+For installation of the raspberry pi. Please refer to the README in raspberry.
+
+## Database Model
 
 ![Database model](/database.png?raw=true)
+
+## Authors
+* matthiasvd2
+* kasumi-owari
