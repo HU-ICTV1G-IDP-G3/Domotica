@@ -47,9 +47,23 @@
 	<div class="box2">
 
 			<h3><span class="oranje">Noodmedlingen:</span></h3>
-			<p>
+			 <p id="result">
+				Geen noodmeldingen
+				<script>
+				window.setInterval(function(data){
+					$.getJSON($SCRIPT_ROOT + '/meldkamer/alarm', function(data){
+						var str = "";
 
-                <span id=result>Geen noodmeldingen</span>
+						for (i = 0; i < data.result.length; i++) {
+							str = str + data.result[i] + "<a class=\"btn btn-primary btn-xs\" href=\"/meldkamer/alarm/opheffen/" + data.result[i][0] + "/\">1. een_adress</a>" + "</br>";
+
+						}
+						$("#result").html(str);
+
+						});
+				}, 5000);
+
+				</script>
 			</p>
 
 	</div>

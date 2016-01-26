@@ -51,7 +51,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='Maybe there is no password?',
+                                 password='The password is not a secret.',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -260,6 +260,14 @@ def alarm():
     cur.execute("SELECT idWoning, adress FROM domotica_db.Woning WHERE helpbutton = 1;")
     a = cur.fetchall()
     return jsonify(result=a)
+
+@app.route('/meldkamer/alarm/opheffen/<woning>/')
+@login_req
+@meldkamer_req
+def alarm_opheffen(woning):
+    cur.execute("UPDATE Woning SET helpbutton=0 WHERE idWoning=%s", (woning))
+    g.db_conn.commit()
+    return redirect(url_for('meldkamer'))
 
 
 #De meldkamer pagina, staat hieronder vermeld:
