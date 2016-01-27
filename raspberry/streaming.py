@@ -35,8 +35,7 @@ def Main():
     currentCamera = None
 
     # Get own ip to know streaming url
-    ip = GetIP()
-    print ip
+    ip = conf['ip']
 
     # Infinite loop to update streaming
     while True:
@@ -88,26 +87,6 @@ def StopStream():
         os.kill(STREAM_PID, signal.SIGINT)
         STREAM_PID = 0
         time.sleep(5) # Give the stream 5 seconds to stop before accepting new changes
-
-# Look for own ip adress and return it
-def GetIP():
-    # Create a socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sockfd = sock.fileno()
-    SIOCGIFADDR = 0x8915
-
-    # Create a struct to request own ip
-    ifreq = struct.pack('16sH14s', 'eth0', socket.AF_INET, '\x00' * 14)
-    try:
-        # Try getting own ip
-        res = fcntl.ioctl(sockfd, SIOCGIFADDR, ifreq)
-    except Exception:
-        # If error occurs return None
-        return None
-
-    # Extract the ip from the struct that was returned
-    ip = struct.unpack('16sH2x4s8x', res)[2]
-    return socket.inet_ntoa(ip) # Return the ip adress
 
 # Check if script is run and not imported
 if __name__ == "__main__":
