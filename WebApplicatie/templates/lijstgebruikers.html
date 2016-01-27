@@ -1,0 +1,49 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<div class="container" style="margin-top: 85px;">
+	<div class="box2">
+			<h3><a href="/admin/" type="button" class="btn btn-warning btn-sm" style="margin-top: -4px;padding: 7px;"><span style="margin-top: -2px;" class="glyphicon glyphicon-chevron-left"></span></a> <span class="oranje">Lijst met gebruikers:</span></h3>
+
+			<table class="table">
+
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Voornaam</th>
+						<th>Achternaam</th>
+						<th>Gebruikersnaam</th>
+						<th>WoningID</th>
+						<th>Rang</th>
+						<th>Edit</th>
+					</tr>
+				</thead>
+
+				<tbody>
+						{% for gebruiker in gebruikers %}
+							<tr>
+								<th scope="row">{{ gebruikers[loop.index0][0] }}</th>
+								<td>{{ gebruikers[loop.index0][1] }}</td>
+								<td>{{ gebruikers[loop.index0][2] }}</td>
+								<td>{{ gebruikers[loop.index0][3] }}</td>
+								<td>{{ gebruikers[loop.index0][4] }}</td>
+								<td>{{ gebruikers[loop.index0][5] }}</td>
+								<td><a href="/admin/gebruikers/aanpassen/{{ gebruikers[loop.index0][0] }}/" type="button" class="btn btn-link" style="margin-top: -6px;padding: 4px;margin-left: -4px;">Edit</a></td>
+							</tr>
+						{% endfor %}
+				</tbody>
+			</table>
+
+
+		<nav>
+			<ul class="pager">
+				<li><a href="{% if not pagina|int == 1 %}/admin/gebruikers/{{ pagina|int - 1 }}/{% endif %}">Vorige</a></li>
+				<li><a href="/admin/gebruikers/{{ pagina|int + 1 }}/">Volgende</a></li>
+			</ul>
+		</nav>
+
+	</div>
+</div>
+
+{% endblock %}

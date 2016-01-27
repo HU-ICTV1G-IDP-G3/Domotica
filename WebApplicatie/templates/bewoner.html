@@ -2,8 +2,10 @@
 
 {% block body %}
 
+<div class="hidden-md hidden-lg" style="margin-bottom: -25px;"></div>
+
 <div class="container" style="margin-top: 85px;">
-	<div class="box2">
+	<div class="box2 hidden-xs hidden-sm">
 		<div class="row" style="margin-top: 10px;">
 				<div class="col-md-2"><span class="glyphicon glyphicon-user icongebruiker"></span></div>
 				<div class="col-md-10" style="margin-left: -40px;">
@@ -32,28 +34,31 @@
 					{% if heeftwoning==1 and heeftverlichting==1 %}
 						{% for lamp in light_info %}
 									<div class="row" style="margin-top: 10px;">
-											<div class="col-md-3">
+											<div class="col-md-7">
 
-													<h4 style="margin-top: 9px;text-transform: capitalize;">{{ light_info[loop.index0][2] }}:</h4>
+													<h4 style="margin-top: 9px;text-transform: capitalize;display: inline;">{{ light_info[loop.index0][2] }}:</h4>
+													<div class="text-right" style="margin-top: -26px;">
+														<input id="verlichting-{{ loop.index0 }}" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
+													</div>
+													<script>
+													  $(function() {
+														$('#verlichting-{{ loop.index0 }}').change(function() {
+														  $.getJSON($SCRIPT_ROOT + '/bewoner/verlichting', {
+															a: $(this).prop('checked'),
+															b: {{ light_info[loop.index0][0] }}
+														  });
+														  return false;
+														})
+													  })
+													</script>
+													<script>
+														$('#verlichting-{{ loop.index0 }}').bootstrapToggle({% if light_info[loop.index0][3]==1 %}'on'{% else %}'off'{% endif %})
+													</script>
 
 											</div>
-											<div class="col-md-9 text-center">
+											<div class="col-md-5 text-center">
 
-												<input id="verlichting-{{ loop.index0 }}" type="checkbox" data-toggle="toggle" data-onstyle="warning" data-on="Aan" data-off="Uit">
-												<script>
-												  $(function() {
-													$('#verlichting-{{ loop.index0 }}').change(function() {
-													  $.getJSON($SCRIPT_ROOT + '/bewoner/verlichting', {
-														a: $(this).prop('checked'),
-														b: {{ light_info[loop.index0][0] }}
-													  });
-													  return false;
-													})
-												  })
-												</script>
-												<script>
-													$('#verlichting-{{ loop.index0 }}').bootstrapToggle({% if light_info[loop.index0][3]==1 %}'on'{% else %}'off'{% endif %})
-												</script>
+
 
 											</div>
 									</div>
@@ -65,6 +70,7 @@
 				{% else %}Error: '{% if heeftwoning==0 %}Geen woning ingesteld en {% else %}Geen {% endif %}verlichting is ingesteld.'{% endif %}
 
 		</div>
+		<div class="hidden-md hidden-lg" style="margin-bottom: 25px;"></div>
 		<div class="col-md-6 text-center">
 				<form method="post">
 				<h3 style="margin-top: -5px;margin-bottom: 20px;"><span class="oranje">Indien u in gevaar verkeerd:</span></h3>

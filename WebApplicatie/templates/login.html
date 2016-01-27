@@ -30,11 +30,12 @@
 <body id="index">
 
 <div class="container">
-  <div class="hidden-xs hidden-sm" style="margin-top: 150px;"></div>
+  <div class="hidden-xs hidden-sm" style="margin-top: 150px;"></div><div class="hidden-md hidden-lg" style="margin-top: 25px;"></div>
   <div class="row">
     <div class="col-md-6">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" class="hidden-md hidden-lg" alt="Do logo" height="55px" style="margin-bottom: 15px;"/></span>
 
-      <div class="box1">
+      <div class="box1 hidden-xs hidden-sm">
           <h1><span class="iconhome glyphicon glyphicon-home"></span><span class="oranje"> <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Do logo" height="65px" style="margin-top: -17px;"/></span></h1>
           <p>
             Beheer online, uw verlichting en zorg voor extra veiligheid door camera toezicht in uw woning. Ontwikkeld door: Paul Ettema, Matthias van Dijk, Youri van Hal, Victor Shao en Kristiaan Hoogendoorn.

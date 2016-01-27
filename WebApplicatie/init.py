@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from flask import Flask, render_template, request, url_for, redirect, session, g, flash, blueprints, jsonify
 import pymysql, re, redis, gc, datetime
 from pymysql import escape_string as escape
@@ -37,12 +39,32 @@ class NieuweGebruikerForm(Form):
            Length(min=2, max=30, message=(u'Uw achternaam moet minimaal 2 en mag maximaal 30 tekens bevatten.'))])
      rang = SelectField('Rang', choices=[("1", "Bewoner"), ("2", "Meldkamer medewerker"), ("3", "Admin")], default="1")
 
+class gebruikeredit(Form):
+     gebruikersnaam = StringField('Gebruikersnaam', validators=[
+           data_required('Voer een gebruikersnaam in.')])
+     voornaam = StringField('Voornaam', validators=[
+           data_required('Dit veld is verplicht.'),
+           Length(min=2, max=30, message=(u'Uw voornaam moet minimaal 2 en mag maximaal 30 tekens bevatten.'))])
+     achternaam = StringField('Achternaam', validators=[
+           data_required('Dit veld is verplicht.'),
+           Length(min=2, max=30, message=(u'Uw achternaam moet minimaal 2 en mag maximaal 30 tekens bevatten.'))])
+     woningid = StringField('WoningID', validators=[
+           data_required('Voer het ID in of NULL.')])
+     rang = SelectField('Rang', choices=[("1", "Bewoner"), ("2", "Meldkamer medewerker"), ("3", "Admin")], default="1")
+
 class LoginForm(Form):
      gebruikersnaam = StringField('Gebruikersnaam', validators=[
            data_required('Voer een gebruikersnaam in.')])
      password = PasswordField('Voer een veilig wachtwoord in.', validators=[
            data_required('Voer een geldig wachtwoord in.')])
 
+class woning_toevoegen(Form):
+     Adres = StringField('Adres', validators=[
+           data_required('Voer het adres in.')])
+
+class wachtwoordaanpassen(Form):
+     password = PasswordField('Voer een veilig wachtwoord in.', validators=[
+           data_required('Voer een geldig wachtwoord in.')])
 
 #Voor serverside sessions, maakt gebruik van redis. (Vergeet dus niet dat redis een vereiste is op de locatie waar je deze applicatie wilt draaien.)
 KVSessionExtension(store, app)
@@ -51,7 +73,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='The password is not a secret.',
+                                 password='The password is hidden in this file, maybe you can find it?',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -334,6 +356,118 @@ def admin():
             return redirect(url_for('admin'))
 
     return render_template("admin.html", NieuweGebruikerForm=form)
+
+@app.route('/admin/gebruikers/<pagina>/', methods=["GET", "POST"])
+@login_req
+@admin_req
+def gebruikerslijst(pagina):
+    limit = int((int(pagina) - 1) * 10)
+    cur.execute("SELECT idUser, forename, lastname, username, idWoning, rank FROM domotica_db.User LIMIT %s,10", (limit))
+    gebruikers = cur.fetchall()
+    return render_template("lijstgebruikers.html", gebruikers=gebruikers, pagina=pagina)
+
+@app.route('/admin/gebruikers/aanpassen/<id>/', methods=["GET", "POST"])
+@login_req
+@admin_req
+def gebruikeraanpassen(id):
+    #Vraagt het eerder gemaakte 'gebruikeredit' form aan.
+    form = gebruikeredit()
+
+    cur.execute("SELECT idUser, forename, lastname, username, idWoning, rank FROM domotica_db.User WHERE idUser=%s", (int(id)))
+    gebruiker = cur.fetchall()
+
+    #Zodra de post op de pagina langs de vallidators van WTForm zijn gegaan kan de rest plaatsvinden.
+    if form.validate_on_submit():
+        #Nodig voor de request die we hierna gaan maken.
+        forminfo = gebruikeredit(request.form)
+
+        #Alle velden worden binnengehaald en aan een variabele gekoppelt.
+        voornaam = forminfo.voornaam.data
+        achternaam = forminfo.achternaam.data
+        rang = forminfo.rang.data
+        idWoning = forminfo.woningid.data
+        gebruikersnaam = forminfo.gebruikersnaam.data
+
+        try:
+            int(idWoning)
+        except:
+            idWoning = None
+
+        cur.execute("UPDATE User SET forename=%s, lastname=%s, username=%s, idWoning=%s, rank=%s WHERE idUser=%s", (voornaam, achternaam, gebruikersnaam, idWoning, int(rang), int(id)))
+        g.db_conn.commit()
+        return redirect(url_for('admin'))
+
+    return render_template("gebruiker.html", form2=form, gebruiker=gebruiker)
+
+
+@app.route('/admin/gebruikers/aanpassen/wachtwoord/<id>/', methods=["GET", "POST"])
+@login_req
+@admin_req
+def gebruikerswachtwoordaanpassen(id):
+
+    cur.execute("SELECT idUser, forename, lastname, username, idWoning, rank FROM domotica_db.User WHERE idUser=%s", (int(id)))
+    gebruiker = cur.fetchall()
+
+    #Vraagt het eerder gemaakte 'wachtwoordaanpassen' form aan.
+    form = wachtwoordaanpassen()
+
+    cur.execute("SELECT idUser, forename, lastname, username, idWoning, rank FROM domotica_db.User WHERE idUser=%s", (int(id)))
+    gebruiker = cur.fetchall()
+
+    #Zodra de post op de pagina langs de vallidators van WTForm zijn gegaan kan de rest plaatsvinden.
+    if form.validate_on_submit():
+        #Nodig voor de request die we hierna gaan maken.
+        forminfo = wachtwoordaanpassen(request.form)
+
+        #Alle velden worden binnengehaald en aan een variabele gekoppelt.
+        wachtwoord = forminfo.password.data
+
+        #Het wachtwoord wordt met een random salt gehashed en beide worden in één variabele gestopt.
+        versleutelde_password = hash.encrypt(escape(wachtwoord))
+
+        cur.execute("UPDATE User SET password=%s WHERE idUser=%s", (versleutelde_password, int(id)))
+        g.db_conn.commit()
+
+        return redirect(url_for('admin'))
+
+    return render_template("gebruiker_wachtwoord_aanpassen.html", gebruiker=gebruiker, form=form)
+
+
+@app.route('/admin/woningen/<pagina>/', methods=["GET", "POST"])
+@login_req
+@admin_req
+def woninglijst(pagina):
+    limit = int((int(pagina) - 1) * 10)
+    cur.execute("SELECT idWoning, adress FROM domotica_db.Woning LIMIT %s,10", (limit))
+    woningen = cur.fetchall()
+    return render_template("lijstwoningen.html", woningen=woningen, pagina=pagina)
+
+@app.route('/admin/woningen/toevoegen/', methods=["GET", "POST"])
+@login_req
+@admin_req
+def woningtoevoegen():
+    #Vraagt het eerder gemaakte 'woning_toevoegen' form aan.
+    form = woning_toevoegen()
+
+    #Zodra de post op de pagina langs de vallidators van WTForm zijn gegaan kan de rest plaatsvinden.
+    if form.validate_on_submit():
+        #Nodig voor de request die we hierna gaan maken.
+        forminfo = woning_toevoegen(request.form)
+
+        #Alle velden worden binnengehaald en aan een variabele gekoppelt.
+        adres = forminfo.Adres.data
+
+        cur.execute("SELECT idWoning, adress FROM domotica_db.Woning WHERE adress=%s", (adres))
+        check = cur.fetchall()
+        if check == ():
+            cur.execute("INSERT INTO Woning (adress, camera, helpbutton) VALUES (%s, 0, 0)", (adres))
+            g.db_conn.commit()
+            return redirect(url_for('admin'))
+        else:
+            form.Adres.errors.append('Dit adres bestaat al')
+
+    return render_template("woning_toevoegen.html", form=form)
+
 
 if __name__ == '__main__':
     app.secret_key = '*87gas6&*(73()fa98Nla&$62Nv%#{az' #Secret key for sessions | This key HAS TO BE CHANGED IN THE FINAL VERSION (and not being published on GitHub)

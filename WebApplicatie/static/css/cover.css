@@ -98,3 +98,12 @@ hr {
   border-style: solid none;
   margin: 18px 0;
 }
+
+#result {
+  font-size: 17px;
+}
+
+#result_button {
+  margin-left: 20px;
+  margin-top: -4px;
+}

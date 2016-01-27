@@ -1,0 +1,39 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<div class="container" style="margin-top: 85px;">
+	<div class="box2">
+			<h3><a href="/admin/" type="button" class="btn btn-warning btn-sm" style="margin-top: -4px;padding: 7px;"><span style="margin-top: -2px;" class="glyphicon glyphicon-chevron-left"></span></a> <span class="oranje">Lijst met gebruikers:</span></h3>
+
+			<table class="table">
+
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Adres</th>
+					</tr>
+				</thead>
+
+				<tbody>
+						{% for woning in woningen %}
+							<tr>
+								<th scope="row">{{ woningen[loop.index0][0] }}</th>
+								<td>{{ woningen[loop.index0][1] }}</td>
+							</tr>
+						{% endfor %}
+				</tbody>
+			</table>
+
+
+		<nav>
+			<ul class="pager">
+				<li><a href="{% if not pagina|int == 1 %}/admin/woningen/{{ pagina|int - 1 }}/{% endif %}">Vorige</a></li>
+				<li><a href="/admin/woningen/{{ pagina|int + 1 }}/">Volgende</a></li>
+			</ul>
+		</nav>
+
+	</div>
+</div>
+
+{% endblock %}

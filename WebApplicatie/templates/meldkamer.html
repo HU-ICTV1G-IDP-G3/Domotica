@@ -55,7 +55,7 @@
 						var str = "";
 
 						for (i = 0; i < data.result.length; i++) {
-							str = str + data.result[i] + "<a class=\"btn btn-primary btn-xs\" href=\"/meldkamer/alarm/opheffen/" + data.result[i][0] + "/\">1. een_adress</a>" + "</br>";
+							str = str + "<b>- Noodoproep | </b> " + "<b>WoningID:</b> " + data.result[i][0] + ". <b>| Adres:</b> " + data.result[i][1] + "<a id=\"result_button\" class=\"btn btn-primary btn-xs\" href=\"/meldkamer/alarm/opheffen/" + data.result[i][0] + "/\">Noodoproep opheffen</a>" + "</br>";
 
 						}
 						$("#result").html(str);

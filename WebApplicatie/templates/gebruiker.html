@@ -1,0 +1,82 @@
+{% extends "template.html" %}
+
+{% block body %}
+
+<div class="container" style="margin-top: 85px;">
+	<div class="box2">
+
+		<div class="row">
+				<div class="col-md-8">
+						<h3><a href="/admin/" type="button" class="btn btn-warning btn-sm" style="margin-top: -4px;padding: 7px;"><span style="margin-top: -2px;" class="glyphicon glyphicon-chevron-left"></span></a> <span class="oranje">Gebruiker aanpassen</span></h3>
+						<form method="post">
+							{{ form2.csrf_token }}
+								<b style="margin-left: 2px;">ID: {{ gebruiker[0][0] }} </b>
+
+
+									<div class="form-group {% if form2.voornaam.errors %} has-error {% endif %}" style="margin-top: 15px;">
+										<label class="col-sm-3 control-label">Voornaam</label>
+										<div class="col-sm-9">
+										{{ form2.voornaam(placeholder="Voornaam", class="form-control", value=gebruiker[0][1], style="margin-top: -7px;") }}
+										</div>
+									</div>
+
+								<div class="form-group {% if form2.achternaam.errors %} has-error {% endif %}">
+									<label class="col-sm-3 control-label" style="margin-top: 13px;">Achternaam</label>
+									<div class="col-sm-9">
+									{{ form2.achternaam(placeholder="Achternaam", class="form-control", value=gebruiker[0][2], style="margin-top: 7px;") }}
+									</div>
+								</div>
+
+								<div class="form-group {% if form2.gebruikersnaam.errors %} has-error {% endif %}">
+									<label class="col-sm-3 control-label" style="margin-top: 13px;">Gebruikersnaam</label>
+									<div class="col-sm-9">
+									{{ form2.gebruikersnaam(placeholder="Gebruikersnaam", class="form-control", value=gebruiker[0][3], style="margin-top: 7px;") }}
+									</div>
+								</div>
+
+								<div class="form-group {% if form2.woningid.errors %} has-error {% endif %}">
+									<label class="col-sm-3 control-label" style="margin-top: 13px;">Woning id</label>
+									<div class="col-sm-9">
+									{{ form2.woningid(placeholder="Woning ID", class="form-control", value=gebruiker[0][4], style="margin-top: 7px;") }}
+									</div>
+								</div>
+
+								<div class="form-group {% if form2.rang.errors %} has-error {% endif %}" >
+
+									<label class="col-sm-3 control-label" style="margin-top: 13px;">Rang</label>
+									<div class="col-sm-9">
+									{{ form2.rang(class="form-control", style="margin-top: 7px;") }}
+									</div>
+
+								</div>
+
+								<script>
+								var temp = "{{ gebruiker[0][5] }}";
+								var mySelect = document.getElementById('rang');
+
+								for(var i, j = 0; i = mySelect.options[j]; j++) {
+									if(i.value == temp) {
+										mySelect.selectedIndex = j;
+										break;
+									}
+								}
+								</script>
+
+								<div class="text-center">
+									<a href="/admin/gebruikers/aanpassen/wachtwoord/{{ gebruiker[0][0] }}/" type="button" class="btn btn-warning" style="width: 95%;margin-top: 12px;">Wachtwoord aanpassen</a>
+								</div>
+
+								<div class="form-group text-right" style="margin-top: 10px;margin-right: 13px;">
+										<div id="AnnulerenGroup" class="btn-group" role="group" aria-label="">
+											<a href="/admin/" type="button" id="Annuleren" name="Annuleren" class="btn btn-default" aria-label="Annuleren">Annuleren</a>
+											<button type="submit" id="Aanmaken" name="Aanmaken" class="btn btn-warning" aria-label="Annuleren">Aanpassen</button>
+										</div>
+								</div>
+						</form>
+				</div>
+		</div>
+
+	</div>
+</div>
+
+{% endblock %}
