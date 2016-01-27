@@ -6,9 +6,13 @@
 * Flask
 * Flask_kvsession
 * Simplekv
-* Redis
+* Redis (and a (local) redis server...)
 * Wtforms
 * PyMySQL
+* Passlib
+* Functools
+* gc
+* Datetime
 * screen
 * libjpeg8-dev
 * imagemagick
