@@ -46,7 +46,7 @@
 <div class="container" style="margin-top: 15px;">
 	<div class="box2">
 
-			<h3><span class="oranje">Noodmedlingen:</span></h3>
+			<h3><span class="oranje">Noodmeldingen:</span></h3>
 			 <p id="result">
 				Geen noodmeldingen
 				<script>
@@ -65,6 +65,28 @@
 
 				</script>
 			</p>
+
+	</div>
+</div>
+
+<div class="container" style="margin-top: 15px;">
+	<div class="box2">
+			<h3><span class="oranje">Servers:</span></h3>
+			<div style="margin-top: 10px;">
+					{% for melding in server_uplist %}
+
+						{% if server_uplist[loop.index0][0] == 1 %}
+
+							<p class="bg-success">Woning_ID {{ server_uplist[loop.index0][2] }}, {{ server_uplist[loop.index0][1] }}.</p>
+
+						{% else %}
+
+							<p class="bg-danger">Woning_ID {{ server_uplist[loop.index0][2] }}, {{ server_uplist[loop.index0][1] }}.</p>
+
+						{% endif %}
+
+					{% endfor %}
+			</div>
 
 	</div>
 </div>

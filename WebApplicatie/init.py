@@ -73,7 +73,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='The password is hidden in this file, maybe you can find it?',
+                                 password='We used your password :)',
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -283,6 +283,25 @@ def alarm():
     a = cur.fetchall()
     return jsonify(result=a)
 
+@app.route('/meldkamer/server_check')
+@login_req
+@meldkamer_req
+def servercheck():
+    cur.execute("SELECT date, adress, idWoning FROM domotica_db.Woning")
+    serverupdate = cur.fetchall()
+    server_uplist = []
+    for i in range(len(serverupdate)):
+        if not serverupdate[i][0] == None:
+            if (serverupdate[i][0] - datetime.datetime.utcnow()).total_seconds() > 50:
+                aan_uit = 0
+            else:
+                aan_uit = 1
+        else:
+            aan_uit = 0
+        list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
+        server_uplist += [list]
+    return jsonify(result=server_uplist)
+
 @app.route('/meldkamer/alarm/opheffen/<woning>/')
 @login_req
 @meldkamer_req
@@ -302,7 +321,23 @@ def meldkamer():
     cur.execute("SELECT idCamera, idWoning, name, url FROM domotica_db.Camera")
     camera_info = cur.fetchall()
     session['camera_url'] = 0
-    return render_template("meldkamer.html", woning_info=woning_info, camera_info=camera_info)
+
+    cur.execute("SELECT date, adress, idWoning FROM domotica_db.Woning")
+    serverupdate = cur.fetchall()
+    server_uplist = []
+    for i in range(len(serverupdate)):
+        if not serverupdate[i][0] == None:
+            if (serverupdate[i][0] - datetime.datetime.utcnow()).total_seconds() > 50:
+                aan_uit = 0
+            else:
+                aan_uit = 1
+        else:
+            aan_uit = 0
+        list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
+        server_uplist += [list]
+    print(server_uplist)
+
+    return render_template("meldkamer.html", woning_info=woning_info, camera_info=camera_info, server_uplist=server_uplist)
 
 @app.route('/meldkamer/<woning>/', methods=["GET", "POST"])
 @login_req

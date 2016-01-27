@@ -107,3 +107,34 @@ hr {
   margin-left: 20px;
   margin-top: -4px;
 }
+
+.online {
+  padding: 10px;
+  background-color: #dff0d8;
+  border-radius: 30px;
+  margin-right: -3px;
+  color: green;
+  font-size: 23px;
+}
+
+.offline {
+  padding: 10px;
+  background-color: #f2dede;
+  border-radius: 30px;
+  margin-right: -3px;
+  color: red;
+  font-size: 23px;
+}
+
+.check {
+  display: block;
+  margin-top: -33px;
+  margin-left: 28px;
+  padding-left: 16px;
+  margin-right: 53%;
+  border-radius: 7px;
+  padding-top: 2px;
+  padding-bottom: 1px;
+  font-size: 17px;
+  margin-bottom: 15px;
+}
