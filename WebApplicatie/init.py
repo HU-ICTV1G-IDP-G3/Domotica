@@ -24,6 +24,8 @@ app.config.update(
     SESSION_KEY_BITS=128
 )
 
+uptime = {}
+
 #Een form gegenereert voor de pagina admin.html
 #Hiermee kan een admin een nieuwe user toevoegen.
 class NieuweGebruikerForm(Form):
@@ -73,7 +75,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password="I deleted the password.",
+                                 password="We have nothing to share with you!",
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -83,6 +85,19 @@ def db_connect():
 @app.teardown_request
 def db_disconnect(exception=None):
     g.db_conn.close()
+
+
+def dictionary(id, date):
+    global uptime
+    try:
+        if uptime[id] == date:
+            return False
+        else:
+            uptime[id] = date
+            return True
+    except Exception:
+        uptime[id] = date
+        return False
 
 #Check of de gebruiker is ingelogd.
 def login_req(f):
@@ -291,13 +306,11 @@ def servercheck():
     serverupdate = cur.fetchall()
     server_uplist = []
     for i in range(len(serverupdate)):
-        if not serverupdate[i][0] == None:
-            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
-                aan_uit = 0
-            else:
-                aan_uit = 1
+        if dictionary(serverupdate[i][2],serverupdate[i][0]):
+            aan_uit = 1
         else:
             aan_uit = 0
+
         list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
         server_uplist += [list]
     return jsonify(result=server_uplist)
@@ -326,13 +339,11 @@ def meldkamer():
     serverupdate = cur.fetchall()
     server_uplist = []
     for i in range(len(serverupdate)):
-        if not serverupdate[i][0] == None:
-            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
-                aan_uit = 0
-            else:
-                aan_uit = 1
+        if dictionary(serverupdate[i][2],serverupdate[i][0]):
+            aan_uit = 1
         else:
             aan_uit = 0
+
         list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
         server_uplist += [list]
 
@@ -355,13 +366,11 @@ def meldkamerstream(woning):
     serverupdate = cur.fetchall()
     server_uplist = []
     for i in range(len(serverupdate)):
-        if not serverupdate[i][0] == None:
-            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
-                aan_uit = 0
-            else:
-                aan_uit = 1
+        if dictionary(serverupdate[i][2],serverupdate[i][0]):
+            aan_uit = 1
         else:
             aan_uit = 0
+
         list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
         server_uplist += [list]
 
@@ -509,6 +518,11 @@ def woningtoevoegen():
         check = cur.fetchall()
         if check == ():
             cur.execute("INSERT INTO Woning (adress, camera, helpbutton) VALUES (%s, 0, 0)", (adres))
+            g.db_conn.commit()
+
+            cur.execute("SELECT idWoning from Woning WHERE adress=%s", (adres))
+            woning_id = cur.fetchall()[0][0]
+            cur.execute("INSERT INTO Camera (idWoning, name, url) VALUES (%s, 'camera1', '/static/img/offline.png')", (int(woning_id)))
             g.db_conn.commit()
             return redirect(url_for('admin'))
         else:
