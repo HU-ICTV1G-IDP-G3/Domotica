@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, request, url_for, redirect, session, g, flash, blueprints, jsonify
-import pymysql, re, redis, gc, datetime
+import pymysql, re, redis, gc, datetime, time
 from pymysql import escape_string as escape
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -75,7 +75,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password="We have nothing to share with you!",
+                                 password="wordpass",
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -90,13 +90,13 @@ def db_disconnect(exception=None):
 def dictionary(id, date):
     global uptime
     try:
-        if uptime[id] == date:
+        if uptime[id][0] == date and not (time.time() - uptime[id][1]) < 2:
             return False
         else:
-            uptime[id] = date
+            uptime[id] = [date, time.time()]
             return True
     except Exception:
-        uptime[id] = date
+        uptime[id] = [date, time.time()]
         return False
 
 #Check of de gebruiker is ingelogd.
