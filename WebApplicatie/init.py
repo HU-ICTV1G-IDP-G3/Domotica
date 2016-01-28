@@ -73,7 +73,7 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='213.233.237.7',
                                  user='domotica',
-                                 password='We used your password :)',
+                                 password="I deleted the password.",
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -292,7 +292,7 @@ def servercheck():
     server_uplist = []
     for i in range(len(serverupdate)):
         if not serverupdate[i][0] == None:
-            if (serverupdate[i][0] - datetime.datetime.utcnow()).total_seconds() > 50:
+            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
                 aan_uit = 0
             else:
                 aan_uit = 1
@@ -327,7 +327,7 @@ def meldkamer():
     server_uplist = []
     for i in range(len(serverupdate)):
         if not serverupdate[i][0] == None:
-            if (serverupdate[i][0] - datetime.datetime.utcnow()).total_seconds() > 50:
+            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
                 aan_uit = 0
             else:
                 aan_uit = 1
@@ -335,7 +335,6 @@ def meldkamer():
             aan_uit = 0
         list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
         server_uplist += [list]
-    print(server_uplist)
 
     return render_template("meldkamer.html", woning_info=woning_info, camera_info=camera_info, server_uplist=server_uplist)
 
@@ -352,7 +351,21 @@ def meldkamerstream(woning):
     cur.execute("SELECT idCamera, name, url, idWoning FROM domotica_db.Camera WHERE idWoning =%s", (int(woning)))
     camera_id = cur.fetchall()
 
-    return render_template("meldkamer2.html", woning_info=woning_info, camera_info=camera_info, camera_id=camera_id)
+    cur.execute("SELECT date, adress, idWoning FROM domotica_db.Woning")
+    serverupdate = cur.fetchall()
+    server_uplist = []
+    for i in range(len(serverupdate)):
+        if not serverupdate[i][0] == None:
+            if (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() > 50 or (datetime.datetime.strptime(str(serverupdate[i][0]), '%Y-%m-%d %H:%M:%S') - datetime.datetime.utcnow()).total_seconds() < -50:
+                aan_uit = 0
+            else:
+                aan_uit = 1
+        else:
+            aan_uit = 0
+        list = [aan_uit, serverupdate[i][1], serverupdate[i][2]]
+        server_uplist += [list]
+
+    return render_template("meldkamer2.html", woning_info=woning_info, camera_info=camera_info, camera_id=camera_id, server_uplist=server_uplist)
 
 
 #De admin pagina, met de funcites om een nieuw account aan te maken en te beheren staat hieronder vermeld:
@@ -506,4 +519,4 @@ def woningtoevoegen():
 
 if __name__ == '__main__':
     app.secret_key = '*87gas6&*(73()fa98Nla&$62Nv%#{az' #Secret key for sessions | This key HAS TO BE CHANGED IN THE FINAL VERSION (and not being published on GitHub)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=80, debug=False)
