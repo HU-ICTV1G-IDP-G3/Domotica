@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, request, url_for, redirect, session, g, flash, blueprints, jsonify
-import pymysql, re, redis, gc, datetime
+import pymysql, re, redis, gc, datetime, time
 from pymysql import escape_string as escape
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
@@ -76,7 +76,11 @@ KVSessionExtension(store, app)
 def db_connect():
     g.db_conn = pymysql.connect(host='127.0.0.1',
                                  user='domotica',
+<<<<<<< HEAD
                                  password="password",
+=======
+                                 password="wordpass",
+>>>>>>> d97c805f4935bbe72fdc7f697efc20644692ceac
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)

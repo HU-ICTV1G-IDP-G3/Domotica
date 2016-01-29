@@ -1,8 +1,10 @@
 host 127.0.0.1
 user domotica
-password dbpassword
+password password
 database domotica_db
 light1 1
 light2 2
 light3 3
 woning 1
+camera1 1
+ip 192.168.1.108
