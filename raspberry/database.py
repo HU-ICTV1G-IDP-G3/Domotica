@@ -51,7 +51,7 @@ def DisconnectDatabase():
 def SetHelpButton(woning, value):
     try:
         with CONNECTION.cursor() as cursor:
-            sql = "UPDATE `Woning` SET `helpbutton`=%s WHERE `idUser`=%s;"
+            sql = "UPDATE `Woning` SET `helpbutton`=%s WHERE `idWoning`=%s;"
             cursor.execute(sql, (str(value), woning))
 
         CONNECTION.commit() # Make sure the changes are updated in the database
@@ -86,6 +86,17 @@ def SetCameraURL(camera, url):
         with CONNECTION.cursor() as cursor:
             sql = "UPDATE `Camera` SET `url`=%s WHERE `idCamera`=%s;"
             cursor.execute(sql, (url, str(camera)))
+
+        CONNECTION.commit() # Make sure the changes are updated in the database
+    except Exception as e:
+        print e
+
+# Update the timestamp to confirm that the raspberry is still up
+def UpdateWoningTimestamp(woning):
+    try:
+        with CONNECTION.cursor() as cursor:
+            sql = "UPDATE `Woning` SET `date`=Timestamp(%s) WHERE `idWoning`=%s;"
+            cursor.execute(sql, (time.strftime('%Y-%m-%d %H:%M:%S'), woning))
 
         CONNECTION.commit() # Make sure the changes are updated in the database
     except Exception as e:

@@ -14,6 +14,7 @@ from wtforms.validators import Length, Email
 
 from passlib.handlers.sha2_crypt import sha256_crypt as hash
 from functools import wraps
+import time
 
 #Importeert de redis functies voor later gebruik.
 store = RedisStore(redis.StrictRedis())
@@ -73,9 +74,9 @@ KVSessionExtension(store, app)
 
 @app.before_request
 def db_connect():
-    g.db_conn = pymysql.connect(host='213.233.237.7',
+    g.db_conn = pymysql.connect(host='127.0.0.1',
                                  user='domotica',
-                                 password="We have nothing to share with you!",
+                                 password="password",
                                  db='domotica_db',
                                  charset='utf8',
                                  port=3306)
@@ -90,13 +91,16 @@ def db_disconnect(exception=None):
 def dictionary(id, date):
     global uptime
     try:
-        if uptime[id] == date:
+        if uptime[id][0] == date:
+            print time.time() - uptime[id][1]
+            if (time.time() - uptime[id][1]) < 10:
+                return True
             return False
         else:
-            uptime[id] = date
+            uptime[id] = [date, time.time()]
             return True
     except Exception:
-        uptime[id] = date
+        uptime[id] = [date, time.time() - 5000]
         return False
 
 #Check of de gebruiker is ingelogd.

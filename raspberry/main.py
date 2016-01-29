@@ -32,6 +32,8 @@ def Main():
             database.SetHelpButton(conf['woning'], 1);
         UpdateLights()
 
+        database.UpdateWoningTimestamp(conf['woning'])
+
         database.DisconnectDatabase()
 
         # Delay before the next update happens
